@@ -1,5 +1,7 @@
 package za.co.johanmynhardt.gae.rest;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -30,7 +32,7 @@ import com.google.appengine.api.users.UserServiceFactory;
 public class SignService {
 
 	@POST
-	public Response processSign(@FormParam("content") String content) {
+	public Response processSign(@FormParam("content") String content) throws URISyntaxException {
 
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
@@ -53,8 +55,9 @@ public class SignService {
 			datastoreService.put(entity);
 			return Response.ok().build();
 		} else {
-			logger.warning("The user needs to be logged in.");
-			return Response.status(Response.Status.UNAUTHORIZED).build();
+			String loginReturnUrl = userService.createLoginURL("/");
+			logger.warning("The user needs to be logged in. Redirecting to " + loginReturnUrl);
+			return Response.temporaryRedirect(new URI(loginReturnUrl)).build();
 		}
 	}
 
