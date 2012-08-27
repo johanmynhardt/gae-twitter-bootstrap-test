@@ -1,0 +1,78 @@
+package za.co.johanmynhardt.gae.rest;
+
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Logger;
+
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+
+/**
+ * @author Johan Mynhardt
+ */
+@Path("/sign")
+public class SignService {
+
+	@POST
+	public Response processSign(@FormParam("content") String content) {
+
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+
+		if (user != null) {
+			logger.info("Name: " + user.getNickname());
+			logger.info("Content: " + content);
+
+			String guestBookName = "guestBookName";
+
+			Key guestbookKey = KeyFactory.createKey("Greeting", guestBookName);
+			Date date = new Date();
+			Entity entity = new Entity("Greeting", guestbookKey);
+
+			entity.setProperty("user", user);
+			entity.setProperty("date", date);
+			entity.setProperty("content", content);
+
+			DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+			datastoreService.put(entity);
+			return Response.ok().build();
+		} else {
+			logger.warning("The user needs to be logged in.");
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+	}
+
+	@GET
+	@Path("/signatures")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getSignatures() {
+
+		DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+
+		Query query = new Query("Greeting", KeyFactory.createKey("Greeting", "guestBookName")).addSort("date", Query.SortDirection.DESCENDING);
+
+		List<Entity> entities = datastoreService.prepare(query).asList(FetchOptions.Builder.withLimit(5));
+
+		logger.info("Got the following entities: " + entities);
+
+		return "signatures...";
+	}
+
+	private final Logger logger = Logger.getLogger(SignService.class.getName());
+}
