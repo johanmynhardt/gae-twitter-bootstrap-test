@@ -87,5 +87,10 @@
 			<name>snapshot</name>
 			<url>file:///tmp/snapshotRepo</url>
 		</snapshotRepository>
+		<repository>
+			<id>release repo</id>
+			<name>Release</name>
+			<url>file:////tmp/release</url>
+		</repository>
 	</distributionManagement>
 </project>
