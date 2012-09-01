@@ -22,6 +22,11 @@
 
 <div id="content"></div>
 
+<h2>Signatures:</h2>
+<div id="signatures">
+<button class="btn" id="load-signatures">Load Signatures</button>
+</div>
+
 <script
 		type="text/javascript"
 		src="js/bootstrap.js">
@@ -45,7 +50,16 @@
 		$.get("/rest/login", function(data){
 			$('#login').html(data);
 		});
+	});
 
+	$("#load-signatures").click(function(event){
+	    event.preventDefault();
+	    $.getJSON("/rest/sign/signatures", function(data) {
+	        $.each(data, function(i, data){
+	            var div_data = "<div>" + data.propertyMap.content + "</div>";
+	            $(div_data).appendTo("#signatures");
+	        });
+	    });
 	});
 </script>
 </html>

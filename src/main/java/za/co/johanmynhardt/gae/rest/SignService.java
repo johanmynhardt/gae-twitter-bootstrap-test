@@ -24,6 +24,10 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 /**
  * @author Johan Mynhardt
@@ -65,17 +69,15 @@ public class SignService {
 	@Path("/signatures")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getSignatures() {
-
 		DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
-
 		Query query = new Query("Greeting", KeyFactory.createKey("Greeting", "guestBookName")).addSort("date", Query.SortDirection.DESCENDING);
-
 		List<Entity> entities = datastoreService.prepare(query).asList(FetchOptions.Builder.withLimit(5));
 
 		logger.info("Got the following entities: " + entities);
 
-		return "signatures...";
+		return gson.toJson(entities);
 	}
 
+    private final Gson gson = new GsonBuilder().serializeNulls().create();
 	private final Logger logger = Logger.getLogger(SignService.class.getName());
 }
