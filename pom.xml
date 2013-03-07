@@ -3,7 +3,7 @@
 	<groupId>za.co.johanmynhardt</groupId>
 	<artifactId>gae-test</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.3</version>
+	<version>1.0.4-SNAPSHOT</version>
 	<name>gae-twitter-bootstrap-test</name>
 	<url>https://github.com/johanmynhardt/gae-twitter-bootstrap-test</url>
 
